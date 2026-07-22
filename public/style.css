@@ -579,7 +579,8 @@ body {
 .panel {
   display: none;
   flex-direction: column;
-  height: 100%;
+  flex: 1;
+  width: 100%;
 }
 
 .panel.active {
@@ -593,8 +594,10 @@ body {
   align-items: center;
   justify-content: center;
   height: 100%;
+  width: 100%;
   text-align: center;
   padding: 40px;
+  margin: 0 auto;
   animation: fadeInUp 0.5s ease;
 }
 
@@ -665,16 +668,23 @@ body {
   display: flex;
   align-items: center;
   gap: 12px;
+  flex: 1;
+  min-width: 0;
+  /* allows text truncation */
 }
 
 .chat-header-info h2 {
   font-size: 16px;
   font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .chat-header-actions {
   display: flex;
   gap: 8px;
+  flex-shrink: 0;
 }
 
 /* Members Sidebar */
@@ -929,10 +939,15 @@ body {
   display: flex;
   align-items: center;
   gap: 12px;
+  flex: 1;
+  min-width: 0;
 }
 
 .dm-header-info h3 {
   font-size: 15px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .dm-status {
@@ -1995,7 +2010,7 @@ body {
   }
 
   .welcome-tips {
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr;
     gap: 6px;
   }
 
