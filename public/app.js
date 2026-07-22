@@ -166,6 +166,80 @@ function doLogin() {
 }
 
 
+// ==================== UNIFIED SIDEBAR ====================
+let allRooms = [];
+let onlineUsersList = [];
+
+socket.on('room-list', (rooms) => {
+    allRooms = rooms;
+    renderUnifiedList();
+});
+
+socket.on('online-users', (users) => {
+    onlineUsersList = users.filter(u => !currentUser || u.username !== currentUser.username);
+    renderUnifiedList();
+});
+
+function renderUnifiedList() {
+    if (!unifiedChatList) return;
+    const query = searchInput.value.toLowerCase();
+    unifiedChatList.innerHTML = '';
+
+    let items = [];
+
+    // Rooms
+    allRooms.forEach(r => {
+        if (!r.name.toLowerCase().includes(query)) return;
+        items.push({
+            type: 'room', id: r.id, name: r.name,
+            icon: r.type === 'music' ? 'fa-music' : 'fa-users',
+            sub: r.type === 'music' ? 'Music Room' : (r.messages && r.messages.length ? r.messages[r.messages.length - 1].text : 'Group Chat'),
+            obj: r
+        });
+    });
+
+    // Users
+    onlineUsersList.forEach(u => {
+        if (!u.username.toLowerCase().includes(query)) return;
+        items.push({
+            type: 'dm', id: u.username, name: u.username,
+            icon: null, sub: u.lastMessage || 'Active now',
+            obj: u
+        });
+    });
+
+    // Render items
+    items.forEach(item => {
+        const isActive = currentChat && currentChat.id === item.id;
+        const div = document.createElement('div');
+        div.className = `ms-chat-item ${isActive ? 'active' : ''}`;
+
+        let avatarHtml = '';
+        if (item.type === 'room') {
+            avatarHtml = `<div class="ms-chat-avatar avatar-color-5" style="display:flex;align-items:center;justify-content:center;color:white;"><i class="fas ${item.icon}"></i></div>`;
+        } else {
+            avatarHtml = `<div class="ms-chat-avatar ${getAvatarColor(item.name)}">${getInitials(item.name)}<span class="status-dot"></span></div>`;
+        }
+
+        div.innerHTML = `
+            ${avatarHtml}
+            <div class="ms-chat-info">
+                <div class="ms-chat-name">${escapeHtml(item.name)}</div>
+                <div class="ms-chat-sub">${escapeHtml(item.sub)}</div>
+            </div>
+        `;
+
+        div.addEventListener('click', () => {
+            if (window.innerWidth <= 768) msSidebar.classList.add('hidden');
+            if (item.type === 'room') joinRoom(item.id);
+            else openDM(item.id);
+        });
+
+        unifiedChatList.appendChild(div);
+    });
+}
+
+searchInput.addEventListener('input', renderUnifiedList);
 
 // ==================== CREATE ROOM ====================
 createRoomBtn.addEventListener('click', () => {
