@@ -1,14 +1,17 @@
 <!DOCTYPE html>
 <html lang="th">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ChatVerse — Real-time Chat, Video & Music</title>
   <meta name="description" content="Real-time chat application with rooms, video calls, and music streaming">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
   <!-- ==================== LOGIN SCREEN ==================== -->
   <div id="login-screen" class="screen active">
@@ -45,8 +48,14 @@
   <!-- ==================== MAIN APP ==================== -->
   <div id="app-screen" class="screen">
     <div class="app-layout">
+      <!-- Mobile Menu Toggle -->
+      <button id="mobile-menu-toggle" class="mobile-menu-toggle">
+        <i class="fas fa-bars"></i>
+      </button>
+      <div id="sidebar-overlay" class="sidebar-overlay"></div>
+
       <!-- Sidebar -->
-      <aside class="sidebar">
+      <aside id="sidebar" class="sidebar">
         <div class="sidebar-header">
           <div class="brand">
             <i class="fas fa-comments"></i>
@@ -303,4 +312,5 @@
   <script src="/socket.io/socket.io.js"></script>
   <script src="app.js"></script>
 </body>
+
 </html>

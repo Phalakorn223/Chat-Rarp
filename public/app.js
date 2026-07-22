@@ -857,3 +857,46 @@ createRoomModal.addEventListener('click', (e) => {
 
 // ==================== INITIAL VOLUME ====================
 musicPlayer.volume = 0.7;
+
+// ==================== MOBILE SIDEBAR ====================
+const mobileMenuToggle = $('mobile-menu-toggle');
+const sidebarEl = $('sidebar');
+const sidebarOverlay = $('sidebar-overlay');
+
+function openSidebar() {
+    sidebarEl.classList.add('active');
+    sidebarOverlay.classList.add('active');
+}
+
+function closeSidebar() {
+    sidebarEl.classList.remove('active');
+    sidebarOverlay.classList.remove('active');
+}
+
+if (mobileMenuToggle) {
+    mobileMenuToggle.addEventListener('click', () => {
+        if (sidebarEl.classList.contains('active')) {
+            closeSidebar();
+        } else {
+            openSidebar();
+        }
+    });
+}
+
+if (sidebarOverlay) {
+    sidebarOverlay.addEventListener('click', closeSidebar);
+}
+
+// Auto-close sidebar on mobile when joining a room or opening DM
+const originalJoinRoom = joinRoom;
+joinRoom = function (roomId) {
+    closeSidebar();
+    originalJoinRoom(roomId);
+};
+
+const originalOpenDM = openDM;
+openDM = function (username) {
+    closeSidebar();
+    originalOpenDM(username);
+};
+
