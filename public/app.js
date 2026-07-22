@@ -85,12 +85,14 @@ musicPlayer = $('music-player');
 
 // ==================== HELPERS ====================
 function getAvatarColor(name) {
+    if (!name) return 'avatar-color-0';
     let hash = 0;
     for (let i = 0; i < name.length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash);
     return `avatar-color-${Math.abs(hash) % 8}`;
 }
 
 function getInitials(name) {
+    if (!name) return '?';
     return name.charAt(0).toUpperCase();
 }
 
@@ -157,6 +159,10 @@ function doLogin() {
             loginScreen.classList.remove('active');
             appScreen.classList.add('active');
             showToast(`Welcome, ${currentUser.username}!`, 'success');
+
+            // Explicitly render immediately & after a short delay in case of event race conditions
+            renderUnifiedList();
+            setTimeout(renderUnifiedList, 200);
         } else {
             loginError.textContent = res.error;
             loginBtn.disabled = false;
@@ -378,11 +384,10 @@ function appendMessageUI(msg) {
 
 sendBtn.addEventListener('click', sendMessage);
 chatInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') sendMessage(); });
-// Support typing indicator
 chatInput.addEventListener('input', () => {
     const val = chatInput.value.trim();
-    if (val.length > 0) $('send-icon').className = 'fas fa-paper-plane';
-    else $('send-icon').className = 'fas fa-thumbs-up';
+    if (val.length > 0) sendBtn.innerHTML = '<i class="fas fa-paper-plane"></i>';
+    else sendBtn.innerHTML = '<i class="fas fa-thumbs-up"></i>';
 });
 
 function sendMessage() {
@@ -410,7 +415,7 @@ function sendMessage() {
     }
 
     chatInput.value = '';
-    $('send-icon').className = 'fas fa-thumbs-up';
+    sendBtn.innerHTML = '<i class="fas fa-thumbs-up"></i>';
 }
 
 socket.on('room-message', (data) => {

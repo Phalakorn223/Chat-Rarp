@@ -143,12 +143,20 @@ io.on('connection', (socket) => {
       if (prevRoom) {
         prevRoom.members.delete(user.username);
         socket.leave(user.currentRoom);
-        // Notify room members that user left
-        socket.to(user.currentRoom).emit('user-left-room', {
-          username: user.username,
-          roomId: user.currentRoom,
-          timestamp: new Date().toISOString()
-        });
+
+        // Auto-delete if empty (and not a core room)
+        if (prevRoom.members.size === 0 && user.currentRoom !== 'lobby' && user.currentRoom !== 'music-room') {
+          rooms.delete(user.currentRoom);
+          console.log(`[SERVER] 🗑️ Room deleted (empty): ${user.currentRoom}`);
+        } else {
+          // Notify room members that user left
+          socket.to(user.currentRoom).emit('user-left-room', {
+            username: user.username,
+            roomId: user.currentRoom,
+            timestamp: new Date().toISOString()
+          });
+        }
+
         io.emit('room-list', getRoomList());
       }
     }
@@ -196,11 +204,16 @@ io.on('connection', (socket) => {
 
       console.log(`[SERVER] ⬅️  ${user.username} left room: ${room.name}`);
 
-      socket.to(user.currentRoom).emit('user-left-room', {
-        username: user.username,
-        roomId: user.currentRoom,
-        timestamp: new Date().toISOString()
-      });
+      if (room.members.size === 0 && user.currentRoom !== 'lobby' && user.currentRoom !== 'music-room') {
+        rooms.delete(user.currentRoom);
+        console.log(`[SERVER] 🗑️ Room deleted (empty): ${room.name}`);
+      } else {
+        socket.to(user.currentRoom).emit('user-left-room', {
+          username: user.username,
+          roomId: user.currentRoom,
+          timestamp: new Date().toISOString()
+        });
+      }
 
       io.emit('room-list', getRoomList());
     }
@@ -385,11 +398,17 @@ io.on('connection', (socket) => {
         const room = rooms.get(user.currentRoom);
         if (room) {
           room.members.delete(user.username);
-          socket.to(user.currentRoom).emit('user-left-room', {
-            username: user.username,
-            roomId: user.currentRoom,
-            timestamp: new Date().toISOString()
-          });
+
+          if (room.members.size === 0 && user.currentRoom !== 'lobby' && user.currentRoom !== 'music-room') {
+            rooms.delete(user.currentRoom);
+            console.log(`[SERVER] 🗑️ Room deleted (empty): ${room.name}`);
+          } else {
+            socket.to(user.currentRoom).emit('user-left-room', {
+              username: user.username,
+              roomId: user.currentRoom,
+              timestamp: new Date().toISOString()
+            });
+          }
         }
       }
 
