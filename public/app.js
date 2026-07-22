@@ -151,7 +151,6 @@ function doLogin() {
     socket.emit('register', username, (res) => {
         if (res.success) {
             currentUser = res.user;
-            myUsername.textContent = currentUser.username;
             myAvatar.textContent = getInitials(currentUser.username);
             myAvatar.className = `avatar-sm ${getAvatarColor(currentUser.username)}`;
 
@@ -166,48 +165,7 @@ function doLogin() {
     });
 }
 
-// ==================== ROOM LIST ====================
-socket.on('room-list', (rooms) => {
-    roomList.innerHTML = '';
-    rooms.forEach(room => {
-        const isMusic = room.type === 'music';
-        const isActive = currentRoom && currentRoom.id === room.id;
-        const div = document.createElement('div');
-        div.className = `room-item ${isActive ? 'active' : ''}`;
-        div.innerHTML = `
-      <div class="room-icon ${room.type}">
-        <i class="fas fa-${isMusic ? 'music' : 'hashtag'}"></i>
-      </div>
-      <div class="room-info">
-        <div class="room-title">${escapeHtml(room.name)}</div>
-        <div class="room-meta">${room.memberCount} member${room.memberCount !== 1 ? 's' : ''}</div>
-      </div>
-    `;
-        div.addEventListener('click', () => joinRoom(room.id));
-        roomList.appendChild(div);
-    });
-});
 
-// ==================== ONLINE USERS ====================
-socket.on('online-users', (users) => {
-    onlineCount.textContent = users.length;
-    onlineUsers.innerHTML = '';
-    users.forEach(user => {
-        const isMe = currentUser && user.username === currentUser.username;
-        const div = document.createElement('div');
-        div.className = `user-item ${isMe ? 'is-me' : ''}`;
-        div.innerHTML = `
-      <div class="avatar-sm ${getAvatarColor(user.username)}">${getInitials(user.username)}</div>
-      <span class="status-dot"></span>
-      <span class="user-name">${escapeHtml(user.username)}${isMe ? ' (you)' : ''}</span>
-      ${!isMe ? '<span class="dm-badge"><i class="fas fa-envelope"></i></span>' : ''}
-    `;
-        if (!isMe) {
-            div.addEventListener('click', () => openDM(user.username));
-        }
-        onlineUsers.appendChild(div);
-    });
-});
 
 // ==================== CREATE ROOM ====================
 createRoomBtn.addEventListener('click', () => {
